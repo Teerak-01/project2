@@ -58,7 +58,65 @@
 					<h2>History</h2>
 					<ul>
 						<li>
-							<?php include 'feature/getStatus.php';?>  
+<?php //-------------------------------------------------------pagging-------------------------------------------------------- ?>
+                <?php
+				// connect to database
+				//$con = mysqli_connect('localhost','root','');
+				//mysqli_select_db($con, 'project');
+
+				// define how many results you want per page
+				$results_per_page = 1; 
+
+				// find out the number of results stored in database
+				include "connect.php";
+				//$sql='SELECT * FROM door where firstname = ? ';
+				$sql = $pdo->prepare("SELECT * FROM door where firstname = ?");
+				$sql->bindParam(1, $_GET["firstname"]);
+				$sql->execute();
+				//$result = mysqli_query($con, $sql);
+				//console.log($sql->fetch())
+				$number_of_results = $sql->get_result();
+
+				// determine number of total pages available
+				$number_of_pages = ceil($number_of_results/$results_per_page);
+
+				// determine which page number visitor is currently on
+				if (!isset($_GET['page'])) {
+				  $page = 1;
+				} else {
+				  $page = $_GET['page'];
+				}
+
+				// determine the sql LIMIT starting number for the results on the displaying page
+				$this_page_first_result = ($page-1)*$results_per_page;
+
+				// retrieve selected results from database and display them on page
+				//$sql='SELECT * FROM door where firstname = ? LIMIT ' . $this_page_first_result . ',' .  $results_per_page;
+				$sql2 = $pdo->prepare('SELECT * FROM door where firstname = ? LIMIT ?,?');
+				$sql2->bindParam(1, $_GET["firstname"]);
+				$sql2->bindParam(2, $this_page_first_result);
+				$sql2->bindParam(3, $results_per_page);
+				$sql2->execute();
+				//$result = mysqli_query($con, $sql);
+
+				while($row = mysqli_fetch_array($sql2->fetch())) {
+				  echo '
+			            <p>
+			                <span style="color:blue;"> date : </span>'.$row["day"].'-'.$row["month"].'-'.$row["year"].'
+			                <span style="color:blue;"> time : </span>'.$row["hour"].':'.$row["minute"].':'.$row["second"].'
+			                <span style="color:blue;"> status : </span> <span style="color:green;">'.$row["status"].'</span>
+			            </p>
+			            ';
+				}
+
+				// display the links to the pages
+				for ($page=1;$page<=$number_of_pages;$page++) {
+				  echo '<a class=pagging href="user.php?username='.$row["username"].'&id='.$row["id"].'&firstname='.$row["firstname"].'&page=' . $page . '">' . $page . '</a> ';
+				}
+
+?>
+
+<?php //--------------------------------------------------------------------------------------------------------------------------- ?>
 						</li>
 						<!-- <li>
 							<p>
