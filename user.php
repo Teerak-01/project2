@@ -59,7 +59,7 @@
 				// define how many results you want per page
 				$results_per_page = 1 ; 
 				$firstname =$_GET['firstname'];
-				echo $firstname;
+				//echo $firstname;
 				// find out the number of results stored in database
 				$sql="SELECT * FROM door where firstname='$firstname' ";
 
