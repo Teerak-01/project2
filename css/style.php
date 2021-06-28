@@ -655,16 +655,15 @@ body {
 	background-position: 0 -196px;
   }
 
+  
   /*--------------- pagging -------------------*/
 
 
-  .pagging,
-  input[type="submit"] {
+  .pagging{
 	background-color: #57614e;
   }
 
-  .pagging,
-  input[type="submit"] {
+  .pagging{
 	background-position: -107px 0;
 	color: #fff;
 	display: inline-block;
@@ -689,4 +688,12 @@ body {
 	text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
 	text-transform: uppercase;
   }
-  
+
+  .pagging#Previous{
+  	height: 30px;
+	width: 80px;
+}
+  .pagging#Next{
+  	height: 30px;
+	width: 50px;
+}

@@ -1,13 +1,5 @@
 <?php
 	include "connect.php";
-	session_start();
-	// ตรวจสอบว่ามีชือใน session หรือไม่ หากไม่มีให้ไปหน้า login อัตโนมัติ
-	if (empty($_SESSION["username"]) ) {
-		header("location: login.php");
-	}
-?>
-<?php
-	include "connect.php";
     $stmt = $pdo->prepare("SELECT * FROM user where username=? and id=?");
 	$stmt->bindParam(1, $_GET["username"]);
 	$stmt->bindParam(2, $_GET["id"]);
@@ -61,21 +53,19 @@
 <?php //-------------------------------------------------------pagging-------------------------------------------------------- ?>
                 <?php
 				// connect to database
-				//$con = mysqli_connect('localhost','root','');
-				//mysqli_select_db($con, 'project');
+				$con = mysqli_connect('localhost','root','');
+				mysqli_select_db($con, 'project');
 
 				// define how many results you want per page
-				$results_per_page = 1; 
-
+				$results_per_page = 1 ; 
+				$firstname =$_GET['firstname'];
+				echo $firstname;
 				// find out the number of results stored in database
-				include "connect.php";
-				//$sql='SELECT * FROM door where firstname = ? ';
-				$sql = $pdo->prepare("SELECT * FROM door where firstname = ?");
-				$sql->bindParam(1, $_GET["firstname"]);
-				$sql->execute();
-				//$result = mysqli_query($con, $sql);
-				//console.log($sql->fetch())
-				$number_of_results = $sql->get_result();
+				$sql="SELECT * FROM door where firstname='$firstname' ";
+
+				//$sql='SELECT * FROM door where firstname = '.$_GET["firstname"];
+				$result = mysqli_query($con, $sql);
+				$number_of_results = mysqli_num_rows($result);
 
 				// determine number of total pages available
 				$number_of_pages = ceil($number_of_results/$results_per_page);
@@ -83,39 +73,77 @@
 				// determine which page number visitor is currently on
 				if (!isset($_GET['page'])) {
 				  $page = 1;
+				  $numPage = 1;
 				} else {
 				  $page = $_GET['page'];
+				  $numPage =$_GET['page'];
 				}
 
 				// determine the sql LIMIT starting number for the results on the displaying page
 				$this_page_first_result = ($page-1)*$results_per_page;
-
+				
 				// retrieve selected results from database and display them on page
-				//$sql='SELECT * FROM door where firstname = ? LIMIT ' . $this_page_first_result . ',' .  $results_per_page;
-				$sql2 = $pdo->prepare('SELECT * FROM door where firstname = ? LIMIT ?,?');
-				$sql2->bindParam(1, $_GET["firstname"]);
-				$sql2->bindParam(2, $this_page_first_result);
-				$sql2->bindParam(3, $results_per_page);
-				$sql2->execute();
-				//$result = mysqli_query($con, $sql);
+				$sql='SELECT * FROM door  LIMIT ' . $this_page_first_result . ',' .  $results_per_page ;
 
-				while($row = mysqli_fetch_array($sql2->fetch())) {
-				  echo '
+
+			    while($row = mysqli_fetch_array($result)){
+			        echo '
 			            <p>
 			                <span style="color:blue;"> date : </span>'.$row["day"].'-'.$row["month"].'-'.$row["year"].'
 			                <span style="color:blue;"> time : </span>'.$row["hour"].':'.$row["minute"].':'.$row["second"].'
 			                <span style="color:blue;"> status : </span> <span style="color:green;">'.$row["status"].'</span>
 			            </p>
 			            ';
+			    }
+
+
+				if($number_of_pages<=10){
+					if ($page>1){
+						$Previous=$page-1;
+						echo '<a class=pagging id="Previous" href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $Previous . '">' . 'Previous '. '</a> ';
+
+					}
+					for ($page=1;$page<=$number_of_pages;$page++) {
+					 echo '<a class=pagging href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $page . '">' . $page . '</a> ';
+					}
+					if ($numPage<$number_of_pages){
+						$Next=$numPage+1;
+						echo '<a class=pagging id="Next" href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $Next . '">' . 'Next '. '</a> ';
+
+				}
+					}
+				else{
+					if ($page>1){
+						$Previous=$page-1;
+						echo '<a class=pagging id="Previous" href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $Previous . '">' . 'Previous '. '</a> ';
+
+					}
+					for ($page=1;$page<=10;$page++) {
+					 echo '<a class=pagging href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $page . '">' . $page . '</a> ';
+					}
+					if ($numPage<$number_of_pages){
+						$Next=$numPage+1;
+						echo '<a class=pagging id="Next" href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $Next . '">' . 'Next '. '</a> ';
+
 				}
 
+				}
+				// while($row = mysqli_fetch_array($result)) {
+				//   echo '
+			    //         <p>
+			    //             <span style="color:blue;"> date : </span>'.$row["day"].'-'.$row["month"].'-'.$row["year"].'
+			    //             <span style="color:blue;"> time : </span>'.$row["hour"].':'.$row["minute"].':'.$row["second"].'
+			    //             <span style="color:blue;"> status : </span> <span style="color:green;">'.$row["status"].'</span>
+			    //         </p>
+			    //         ';
+				// }
+				
 				// display the links to the pages
-				for ($page=1;$page<=$number_of_pages;$page++) {
-				  echo '<a class=pagging href="user.php?username='.$row["username"].'&id='.$row["id"].'&firstname='.$row["firstname"].'&page=' . $page . '">' . $page . '</a> ';
-				}
-
+				// for ($page=1;$page<=$number_of_pages;$page++) {
+				//   echo '<a class=pagging href="user.php?username='.$_GET["username"].'&id='.$_GET["id"].'&firstname='.$_GET["firstname"].'&page=' . $page . '">' . $page . '</a> ';
+				// }
 ?>
-
+<?php //include 'feature/getStatus.php';?>
 <?php //--------------------------------------------------------------------------------------------------------------------------- ?>
 						</li>
 						<!-- <li>

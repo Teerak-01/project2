@@ -1,11 +1,3 @@
-<?php
-	include "connect.php";
-	session_start();
-	// ตรวจสอบว่ามีชือใน session หรือไม่ หากไม่มีให้ไปหน้า login อัตโนมัติ
-	if (empty($_SESSION["username"]) ) {
-		header("location: login.php");
-	}
-?>
 <html>
 <head>
 	<title>Project - User-list</title>
@@ -32,6 +24,9 @@
 				<h1>user</h1>
 
 <?php //-------------------------------------------------------pagging-------------------------------------------------------- ?>
+
+
+
                 <?php
 				// connect to database
 				$con = mysqli_connect('localhost','root','');
@@ -51,8 +46,10 @@
 				// determine which page number visitor is currently on
 				if (!isset($_GET['page'])) {
 				  $page = 1;
+				  $numPage = 1;
 				} else {
 				  $page = $_GET['page'];
+				  $numPage =$_GET['page'];
 				}
 
 				// determine the sql LIMIT starting number for the results on the displaying page
@@ -87,9 +84,40 @@
 				}
 
 				// display the links to the pages
-				for ($page=1;$page<=$number_of_pages;$page++) {
-				 echo '<a class=pagging href="user-list.php?page=' . $page . '">' . $page . '</a> ';
+
+				if($number_of_pages<=10){
+					if ($page>1){
+						$Previous=$page-1;
+						echo '<a class=pagging id="Previous" href="user-list.php?page=' . $Previous . '">' . 'Previous '. '</a> ';
+
+					}
+					for ($page=1;$page<=$number_of_pages;$page++) {
+					 echo '<a class=pagging href="user-list.php?page=' . $page . '">' . $page . '</a> ';
+					}
+					if ($numPage<$number_of_pages){
+						$Next=$numPage+1;
+						echo '<a class=pagging id="Next" href="user-list.php?page=' . $Next . '">' . 'Next '. '</a> ';
+
 				}
+				}
+				else{
+					if ($page>1){
+						$Previous=$page-1;
+						echo '<a class=pagging id="Previous" href="user-list.php?page=' . $Previous . '">' . 'Previous '. '</a> ';
+
+					}
+					for ($page=1;$page<=10;$page++) {
+					 echo '<a class=pagging href="user-list.php?page=' . $page . '">' . $page . '</a> ';
+					}
+					if ($numPage<$number_of_pages){
+						$Next=$numPage+1;
+						echo '<a class=pagging id="Next" href="user-list.php?page=' . $Next . '">' . 'Next '. '</a> ';
+
+				}
+
+				}
+
+
 
 ?>
 
